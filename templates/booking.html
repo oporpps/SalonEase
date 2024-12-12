@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าจอง</title>
+    <style>
+        
+
+        body {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #E5DCBC, #D3C4A5);
+            font-family: 'Prompt', Arial, sans-serif;
+        }
+
+        main {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin: 3% auto;
+        }
+
+        .booking {
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="date"],
+        input[type="time"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="booking">
+            <h2>รายละเอียดการจองคิว</h2>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="name">ชื่อของคุณ:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">เบอร์:</label>
+                    <input type="text" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">เลือกวันที่:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <p>เวลานัดหมาย</p>
+                    <label for="starttime">เวลาเริ่มต้น:</label>
+                    <input type="time" id="starttime" name="starttime" required>
+                </div>
+                <div class="form-group">
+                    <label for="finishtime">เวลาสิ้นสุด:</label>
+                    <input type="time" id="finishtime" name="finishtime" required>
+                </div>              
+                <div class="form-group">
+                    <label for="nametc">เลือกช่าง:</label>
+                    <select id="nametc" name="nametc" required>
+                        {% for a in add %}
+                        <option value="{{a.nametc}}">{{a.nametc}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="service">เลือกบริการ:</label>
+                    <select id="service" name="service" required>
+                        {% for t in test %}
+                        <option value="{{t.service}}">{{t.service}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="price">ใส่ราคา:</label>
+                    <input type="text" id="price" name="price" required>
+                </div> -->
+                <button type="submit" class="btn">จองตอนนี้</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('booking-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const date = document.getElementById('date').value;
+            const starttime = document.getElementById('starttime').value;
+            const finishtime = document.getElementById('finishtime').value;
+            const service = document.getElementById('service').value;
+            const nametc = document.getElementById('nametc').value;
+
+            const data = {
+                name: name,
+                phone: phone,
+                date: date,
+                starttime: starttime,
+                finishtime: finishtime,
+                service: service,
+                nametc: nametc,
+            };
+
+            fetch('/api/booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.msg);
+                location.reload(); // รีเฟรชหน้าเว็บหลังจากการจองสำเร็จ
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('ขออภัยมีการจองในเวลานี้แล้ว');
+            });
+        });
+        document.getElementById('starttime').addEventListener('input', function() {
+            this.value = this.value.split(':')[0] + ':00';
+        });
+    
+        document.getElementById('finishtime').addEventListener('input', function() {
+            this.value = this.value.split(':')[0] + ':00';
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

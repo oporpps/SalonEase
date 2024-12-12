@@ -1,0 +1,277 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Schedule</title>
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        .table-container {
+            width: 90%;
+            background-color: #ffffff;
+            padding: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            padding-right: 10%;
+            margin-left: 40px;
+        }
+
+        .search-container {
+            width: 90%;
+            margin: 20px auto;
+            text-align: right;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        table {
+            width: 110%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button.delete {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 10px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+        }
+        
+        button.delete:hover {
+            background-color: #ff1a1a;
+        }
+        
+        button.edit {
+            background-color: #0044cd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 10px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+        }
+        
+        button.edit:hover {
+            background-color: #3edcff;
+        }
+
+        button.send {
+            background-color: #00bc09;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 10px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="ค้นหาเบอร์ลูกค้า...">
+        <button onclick="searchBooking()">ค้นหา</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>เวลา</th>
+                    <th>ปี/เดือน/วัน</th>
+                    <!-- <th>คิวที่</th> -->
+                    <th>ชื่อลูกค้า</th>
+                    <th>บริการ</th>
+                    <th>ค่าบริการ</th>
+                    <th>เบอร์ลูกค้า</th>
+                    <th>ช่าง</th>
+                    <th>สถานะ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="booking-table">
+                {% for b in booboo %}
+                <tr>
+                    <td >
+                        {{b.start_time}}
+                        <input type="hidden" id="start_time_data_{{ b.id }}" value="{{ b.start_time }}"> น. - {{b.finish_time}} น. </td>
+
+                    <td>
+                        {{b.date}}
+                        <input type="hidden" id="date_data_{{ b.id }}" value="{{ b.date }}">
+                    </td>
+                    <!-- <td>คิวที่:{{b.number}}</td> -->
+                    <td >{{b.name}}</td>
+                    <td>
+                        {{ b.service }}
+                        <input type="hidden" id="service_data_{{ b.id }}" value="{{ b.service }}">
+                    </td>
+                    <td>
+                        {{ b.price }}
+                        <input type="hidden" id="price_data_{{ b.id }}" value="{{ b.price }}">
+                    </td>
+                    <td>{{b.phone}}</td>
+                    <td>
+                        {{ b.nametc }}
+                        <input type="hidden" id="nametc_data_{{ b.id }}" value="{{ b.nametc }}">
+                    </td>
+                    <td>
+                        <input type="hidden" id="status_data_{{ b.id }}" value="{{ b.status }}">
+                        {% if b.status == "pending" %}
+                        จอง
+                        {% elseif b.status == "progress" %}
+                        กำลังทำ
+                        {% else %}
+                        ยกเลิก
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post">
+                            <button type="button" class="delete" onclick="confirmDelete('{{ b.id }}')">ลบ</button>
+                            <button type="button" class="edit" onclick="editBooking('{{ b.id }}')">แก้ไข</button>
+                            <button type="button" class="send" onclick="sendBooking('{{ b.id }}')">ยืนยัน</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function confirmDelete(id) {
+            if (confirm("กดตกลงเพื่อลบ")) {
+                try {
+                    let response = await fetch('/api/delete', {
+                        method: 'DELETE',
+                        body: JSON.stringify({
+                            id
+                        })
+                    });
+                    if (response.ok) {
+                        alert('ลบเรียบร้อย');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting');
+                }
+            }
+        }
+
+        function editBooking(id) {
+            window.location.href = `/edit/${id}`;
+        }
+        
+        function searchBooking() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.getElementById('booking-table').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName('td');
+                let nameCell = cells[5]; // ชื่อลูกค้า column
+                if (nameCell) {
+                    let nameValue = nameCell.textContent || nameCell.innerText;
+                    rows[i].style.display = nameValue.toLowerCase().indexOf(input) > -1 ? "" : "none";
+                }
+            }
+        }
+
+        async function sendBooking(id) {
+            if (confirm("กดตกลงเพื่อยืนยัน เพื่อส่งไปคำนวณ ##ไม่สามารถลบได้ ยกเว้นจะลบที่ MYSQL ")) {
+                try {
+                    let response = await fetch('/api/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            price: document.getElementById(`price_data_${id}`).value,
+                            nametc: document.getElementById(`nametc_data_${id}`).value,
+                            service: document.getElementById(`service_data_${id}`).value,
+                            start_time: document.getElementById(`start_time_data_${id}`).value,
+                            date: document.getElementById(`date_data_${id}`).value,
+                        })
+                    });
+                    if (response.ok) {
+                        alert('ส่งเรียบร้อย');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
+{% endblock %}

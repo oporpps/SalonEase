@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;700&display=swap">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: 'Prompt', Arial, sans-serif;
+            background-color: #E5DCBC;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            margin-left: 40%;
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-container h2 {
+            margin: 0 0 20px;
+            text-align: center;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+        .login-container input[type="text"], 
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+        .login-container button:hover {
+            background-color: #4cae4c;
+        }
+        .message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>เข้าสู่ระบบ</h2>
+        <form id="loginForm">
+            <label for="username">ชื่อผู้ใช้</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">รหัสผ่าน</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">เข้าสู่ระบบ</button>
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+    
+            const loginData = {
+                username: username,
+                password: password
+            };
+    
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = 'เข้าสู่ระบบสำเร็จ';
+                } else {
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = 'กรุณารอสักครู่';
+                }
+                // Reload the page regardless of the outcome
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500); // Adjust the delay as needed
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                messageElement.style.color = 'red';
+                messageElement.textContent = 'เกิดข้อผิดพลาด โปรดลองอีกครั้ง';
+                // Reload the page in case of an error
+                setTimeout(() => {
+                    window.location.reload();
+                }, 10); // Adjust the delay as needed
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
+{% endblock %}

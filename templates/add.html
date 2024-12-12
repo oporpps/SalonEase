@@ -1,0 +1,274 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="th">
+
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มและลบช่าง</title>
+    <style>
+        .container {
+            display: flex;
+            height: 100vh;               /* ความสูงเต็มหน้าจอ */
+        }
+
+        .section {
+            flex: 1; /* ให้แต่ละ section ขยายเต็มพื้นที่ */
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        form {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.a {
+            padding: 8px 16px;
+            background-color: #1e36d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.a:hover {
+            background-color: #04167a;
+        }
+
+        button.delete {
+            background-color: #f44336;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.delete:hover {
+            background-color: #d32f2f;
+        }
+
+        .vertical-line {
+            border-left: 2px solid rgb(81, 73, 73);
+            height: auto;
+            /* ใช้ auto เพื่อให้ปรับตามเนื้อหาของคอลัมน์ */
+            margin: 0 20px;
+            display: inline-block;
+            /* ป้องกันการหดตัวของเส้น */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="section">
+            <h2>เพิ่มและลบช่างเสริมสวย</h2>
+
+            <form id="addForm1">
+                <label for="dataInput1">ชื่อช่าง:</label>
+                <input type="text" id="dataInput1" name="dataInput1" required>
+                <button type="submit">เพิ่ม</button>
+            </form>
+
+            <h2>รายชื่อช่างเสริมสวยทั้งหมด</h2>
+
+            <table id="dataTable1">
+                <thead>
+                    <tr>
+                        <th>ชื่อ</th>
+                        <th>ลบชื่อช่างเสริมสวยออกจากรายชื่อ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in add %}
+                    <tr>
+                        <td>{{ a.nametc }}</td>
+                        <td><button class="delete" onclick="confirmDelete('{{ a.id }}')">ลบ</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="vertical-line"></div>
+        <div class="section">
+            <h2>เพิ่มและลบบริการ</h2>
+
+            <form id="addForm2">
+                <label for="dataInput2">บริการ:</label>
+                <input type="text" id="dataInput2" name="dataInput2" required>
+                <button class="a" type="submit">เพิ่ม</button>
+            </form>
+
+            <h2>บริการทั้งหมด</h2>
+
+            <table id="dataTable2">
+                <thead>
+                    <tr>
+                        <th>บริการ</th>
+                        <th>ลบบริการ</th>
+                    </tr>
+                </thead>
+                {% for s in service %}
+                <tbody>
+                    <tr>
+                        <td>{{ s.service }}</td>
+                        <td><button class="delete" onclick="confirmDeletea('{{ s.id }}')">ลบ</button></td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addForm1').addEventListener('submit', function (event) {
+            event.preventDefault(); // ป้องกันการ submit แบบดั้งเดิม
+    
+            // ดึงค่าจาก input field
+            const dataInput1 = document.getElementById('dataInput1').value;
+    
+            // สร้าง payload สำหรับการส่งข้อมูล
+            const payload = {
+                type: 'nametc',  // บ่งชี้ว่าเป็นการเพิ่มช่างเสริมสวย
+                nametc: dataInput1,
+            };
+    
+            // ส่งข้อมูลไปยัง API
+            fetch('/api/add', {  // แก้ไข URL ให้ตรงกับ API ของคุณ
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                location.reload(); // รีเฟรชหน้า
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    
+        document.getElementById('addForm2').addEventListener('submit', function (event) {
+            event.preventDefault(); // ป้องกันการ submit แบบดั้งเดิม
+    
+            // ดึงค่าจาก input field
+            const dataInput2 = document.getElementById('dataInput2').value;
+    
+            // สร้าง payload สำหรับการส่งข้อมูล
+            const payload = {
+                type: 'service',  // บ่งชี้ว่าเป็นการเพิ่มบริการ
+                service: dataInput2
+            };
+    
+            // ส่งข้อมูลไปยัง API
+            fetch('/api/addservice', {  // แก้ไข URL ให้ตรงกับ API ของคุณ
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                location.reload(); // รีเฟรชหน้า
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+        async function confirmDelete(id) {
+            if (confirm("กดตกลงเพื่อลบ")) {
+                try {
+                    let response = await fetch('/api/deletetc', {
+                        method: 'DELETE',
+                        body: JSON.stringify({
+                            id
+                        })
+                    });
+                    if (response.ok) {
+                        alert('ลบเรียบร้อย');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting');
+                }
+            }
+        }
+        async function confirmDeletea(id) {
+            if (confirm("กดตกลงเพื่อลบ")) {
+                try {
+                    let response = await fetch('/api/deletesv', {
+                        method: 'DELETE',
+                        body: JSON.stringify({
+                            id
+                        })
+                    });
+                    if (response.ok) {
+                        alert('ลบเรียบร้อย');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting');
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
+{% endblock %}

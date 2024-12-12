@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* กำหนดสไตล์สำหรับตาราง */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+  
+    th {
+      background-color: #f4f4f4;
+    }
+  
+    /* กำหนดความสูงและทำให้ตารางสามารถเลื่อนดูได้ */
+    .table-container {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+  
+    /* เพิ่มสไตล์เพิ่มเติมสำหรับแถวสรุปค่าจ้าง */
+    .total-row th {
+      background-color: #dff0d8;
+      text-align: center;
+    }
+  
+    /* สไตล์สำหรับปุ่มเคลียร์ */
+    .clear-button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  
+    .clear-button:hover {
+      background-color: #ff1a1a;
+    }
+
+    button.delete {
+      margin-left: 85%;
+      margin-top: 20px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition-duration: 0.4s;
+  }
+  </style>
+  
+</head>
+<body>
+  <div class="table-container">
+    <table id="dataTable">
+      <tr>
+        <th>ช่างเสริมสวย</th>
+        <th>ปี/เดือน/วัน</th>
+        <th>เวลา</th>
+        <th>บริการ</th>
+        <th>ค่าจ้าง</th>
+      </tr>
+      {% for m in math.data[-10:] %}
+      <tr>
+        <td >{{ m.nametc }}</td>
+        <td>{{ m.date }}</td>
+        <td>{{ m.start_time }}</td>
+        <td>
+          {% if m.service == "hairup" %}
+          ต่อผม
+          {% elseif m.service == "hair-coloring" %}
+          ทำสีผม
+          {% elseif m.service == "massage" %}
+          สปาผม
+          {% else %}
+          สระผม
+          {% endif %}
+        </td>
+        <td>{{ m.price}} บาท</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <table id="summaryTable">
+    <tr class="total-row">
+      <th colspan="2">ยอดค่าบริการทั้งหมด</th>
+    </tr>
+    {% for m in math.summery %}
+    <tr>
+      <td>{{ m.name }}</td>
+      <td>{{ m.salary }} บาท</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <form method="post">
+    <button type="button" class="delete" onclick="confirmDelete('{{ math.id }}')">เคลียร์ข้อมูลทั้งหมด</button>
+  </form>
+  
+</body>
+</html>
+<script>
+  async function confirmDelete(ids) {
+    if (confirm("กดตกลงเพื่อเคลียร์ข้อมูลทั้งหมด")) {
+        try {
+            let response = await fetch('/api/deletemoney', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: ids }) // ส่ง ids ทั้งหมดไปใน body
+            });
+            if (response.ok) {
+                alert('เคลียร์ข้อมูลทั้งหมดแล้ว');
+                location.reload(); // รีโหลดหน้าหลังจากลบข้อมูลเสร็จ
+            } else {
+                alert('ลบข้อมูลไม่สำเร็จ');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาดในการลบข้อมูล');
+        }
+    }
+}
+</script>
+{% endblock %}

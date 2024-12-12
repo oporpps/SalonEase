@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Management</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .edit-btn, .save-btn {
+            cursor: pointer;
+            padding: 5px 10px;
+            margin: 2px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .save-btn {
+            background-color: #008CBA;
+        }
+        h2{
+            text-align: center;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<h2>แก้ไข</h2>
+
+<div class="p-4">
+    <table id="customerTable">
+        <thead>
+            <tr>
+                <th>ปี/เดือน/วัน</th>
+                <th>เวลาเริ่มต้น</th>
+                <th>เวลาสิ้นสุด</th>
+                <!-- <th>คิวที่</th> -->
+                <th>ชื่อลูกค้า</th>
+                <th>บริการ</th>
+                <th>ค่าบริการ</th>
+                <th>เบอร์ลูกค้า</th>
+                <th>สถานะ</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input id="date_data_{{ booboo.id  }}" type="text" value="{{ booboo.date }}"></td>
+                <td><input id="start_time_data_{{ booboo.id  }}" type="text" value="{{ booboo.start_time }}"></td>
+                <td><input id="finish_data_{{ booboo.id  }}" type="text" value="{{ booboo.finish_time }}"></td>
+                <!-- <td><input id="number_data_{{ booboo.id  }}" type="text" value="{{ booboo.number }}"></td> -->
+                <td><input id="name_data_{{ booboo.id  }}" type="text" value="{{ booboo.name }}"></td>
+                <td><input id="service_data_{{ booboo.id  }}" type="text" value="{{ booboo.service }}"></td>
+                    <!-- <select id="service_data_{{ booboo.id  }}">
+                        <option value="{{ booboo.service }}" {% if booboo.service == 'hair-coloring' %}selected{% endif %}>{{ booboo.service }}</option>
+                    </select> -->
+                </td>
+                <td><input id="price_data_{{ booboo.id  }}" type="number" value="{{ booboo.price }}"></td>
+                <td><input id="phone_data_{{ booboo.id  }}" type="text" value="{{ booboo.phone }}"></td>
+                <td>
+                    <select id="status_data_{{ booboo.id  }}">
+                        <option value="pending" {% if booboo.status == 'pending' %}selected{% endif %}>จอง</option>
+                        <option value="progress" {% if booboo.status == 'progress' %}selected{% endif %}>กำลังทำ</option>
+                        <option value="finish" {% if booboo.status == 'finish' %}selected{% endif %}>ยกเลิก</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="save-btn" onclick="saveRow('{{ booboo.id }}')">บันทึก</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function saveRow(id) {
+        if (confirm("กดตกลงเพื่อยืนยัน")) {
+            try {
+                let response = await fetch('/api/update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        date: document.getElementById(`date_data_${id}`).value,
+                        start_time: document.getElementById(`start_time_data_${id}`).value,
+                        finish_time: document.getElementById(`finish_data_${id}`).value,
+                        name: document.getElementById(`name_data_${id}`).value,
+                        service: document.getElementById(`service_data_${id}`).value,
+                        price: document.getElementById(`price_data_${id}`).value,
+                        phone: document.getElementById(`phone_data_${id}`).value,
+                        status: document.getElementById(`status_data_${id}`).value,
+                    })
+                });
+
+                if (response.ok) {
+                    alert('อัพเดทเรียบร้อย');
+                    window.location="/bookinglist";
+                } else {
+                    alert('ยืนยันไม่สำเร็จ');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('ยืนยันไม่สำเร็จ');
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
+{% endblock %}
